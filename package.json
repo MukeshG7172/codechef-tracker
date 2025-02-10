@@ -1,0 +1,45 @@
+{
+  "name": "contest-tracker-be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec \"ts-node\" src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "prisma generate"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.3.1",
+    "@types/express": "^5.0.0",
+    "@types/node-schedule": "^2.1.7",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "ioredis": "^5.4.2",
+    "node-fecth": "0.0.1-security",
+    "node-fetch": "^3.3.2",
+    "node-schedule": "^2.1.1",
+    "prisma": "^6.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma"
+    ]
+  }
+}
