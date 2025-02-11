@@ -1,4 +1,3 @@
-import axios from "axios";
 import * as cheerio from "cheerio";
 
 interface ContestDetails {
@@ -8,45 +7,54 @@ interface ContestDetails {
 
 export async function getCodechefRank(username: string) {
   try {
+    const { default: got } = await import("got");
+
     const url = `https://www.codechef.com/users/${username}`;
-    const response = await axios.get(url);
-    const html = response.data;
+    const html = await got(url).text();
     const $ = cheerio.load(html);
-    
+
     const url1 = `https://codechef-api.vercel.app/handle/${username}`;
-    const response1 = await axios.get(url1);
-    
+    const response1 = await got(url1).json<any>();
+
     const cleanText = (text: string) => text.replace(/\s+/g, " ").trim();
 
-    // Helper function to clean text
-    let name:string = response1.data.name;
-    let currentRating:number = response1.data.currentRating;
-    let highestRating:number = response1.data.highestRating;
-    let globalRank:number = response1.data.globalRank;
-    let countryRank:number = response1.data.countryRank;
-    let stars:string = response1.data.stars;
-    let latestContestData:any = response1.data.ratingData[response1.data.ratingData.length-1];
-   
+    // Extract details from API response
+    let name: string = response1.name;
+    let currentRating: number = response1.currentRating;
+    let highestRating: number = response1.highestRating;
+    let globalRank: number = response1.globalRank;
+    let countryRank: number = response1.countryRank;
+    let stars: string = response1.stars;
+    let latestContestData: any = response1.ratingData[response1.ratingData.length - 1];
+
+    // Extract last contest problems solved
     const lastContest = cleanText($(".problems-solved .content").last().text());
     const contestPattern = /(Starters \d+.*?)(?=Starters \d+|$)/g;
     const contest = lastContest.match(contestPattern);
 
-    const contestDetailsArray: ContestDetails[] = contest?.map((contest) => {
-      const [contestName, ...problems] = contest.split(/(?<=\))\s*/); // Split by first occurrence of problem descriptions
-      const problemsSolved = problems.join("").split(", ").map(cleanText); // Format problem list
-      return {
-        contestName: cleanText(contestName),
-        problemsSolved: problemsSolved.length > 0 ? problemsSolved : ["N/A"],
-      };
-    }) || [];
+    const contestDetailsArray: ContestDetails[] =
+      contest?.map((contest) => {
+        const [contestName, ...problems] = contest.split(/(?<=\))\s*/);
+        const problemsSolved = problems.join("").split(", ").map(cleanText);
+        return {
+          contestName: cleanText(contestName),
+          problemsSolved: problemsSolved.length > 0 ? problemsSolved : ["N/A"],
+        };
+      }) || [];
 
-    const contestDetails ={
+    // Plagiarism details
+    const plagiarismStatus = latestContestData.reason
+      ? `Penalized for: ${latestContestData.reason}`
+      : "No plagiarism detected";
+
+    const contestDetails = {
       code: latestContestData.code,
       name: latestContestData.name,
       rank: latestContestData.rank,
       rating: latestContestData.rating,
       date: latestContestData.end_date.split(" ")[0],
-      problemsSolved: contestDetailsArray.flatMap(contest => contest.problemsSolved),
+      problemsSolved: contestDetailsArray.flatMap((contest) => contest.problemsSolved),
+      plagiarismStatus,
     };
 
     const result = {

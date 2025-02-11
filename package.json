@@ -24,6 +24,7 @@
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "got": "^14.4.6",
     "ioredis": "^5.4.2",
     "node-fecth": "0.0.1-security",
     "node-fetch": "^3.3.2",
