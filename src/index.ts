@@ -1,10 +1,3 @@
-import * as cheerio from "cheerio";
-
-interface ContestDetails {
-  contestName: string;
-  problemsSolved: string[];
-}
-
 export async function getCodechefRank(username: string) {
   try {
     const { default: got } = await import("got");
